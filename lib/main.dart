@@ -1,7 +1,7 @@
-import 'package:calci/Calculator.dart';
+
 import 'package:flutter/material.dart';
 
-import 'Calculator.dart' as Calculator;
+import 'Calculator.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,10 +15,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Nitin'),
     );
   }
 }
@@ -43,7 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    var numArray = ["C","(",")","Cl",7,8,9,"/",4,5,6,"x",1,2,3,"-",0,".","=","+"];
+    var numArray = ["C","(",")","CLR",7,8,9,"/",4,5,6,"x",1,2,3,"-",0,".","=","+"];
 
 
     return Scaffold(
@@ -54,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
         body: Container(
           width: double.infinity,
           height: double.infinity,
-          color: Colors.black45,
+          color: Colors.black,
           child: Column(
             children: [
               SizedBox(
@@ -63,48 +64,96 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: TextField(controller: no1Controller,),
+                      child: TextField(
+                        controller: no1Controller,
+                        readOnly: true,
+                        textAlign: TextAlign.right,
+                        style: const TextStyle(
+                          fontSize: 40,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                        ),
+                      )
+                      ,
                     ),
                     Padding(
                       padding: const EdgeInsets.all(22.0),
-                      child: TextField(controller: no2Controller,),
+                      child: TextField(
+                        controller: no2Controller,
+                        readOnly: true,
+                        textAlign: TextAlign.right,
+                        style: const TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                        ),
+                      )
+                      ,
                     ),
                   ],
                 ),
               ),
 
               Expanded(
-                child: GridView.builder(itemCount: numArray.length,gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4), itemBuilder: (context,index){
+                child: GridView.builder(itemCount: numArray.length,gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4,childAspectRatio: 1,crossAxisSpacing: 12,mainAxisSpacing: 12), itemBuilder: (context,index){
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
-
-                    child: SizedBox(child: ElevatedButton(onPressed: (){
-                      no2Controller.text = expression;
-                      setState(() {
-                        if(numArray[index]=='C'){
-                          expression = '';
-                          no1Controller.clear();
-                          no2Controller.clear();
-                        } else if(numArray[index]=='='){
-                          String m = Calculator.Calculation(expression);
-                          // print("Result is $m");
-                        }
-                        else if(numArray[index]=='+'){
-                          expression += '+';
-                        }
-                        else if(numArray[index]=='-'){
-                          expression += "-";
-                        }
-                        else if(numArray[index]=='x'){
-                          expression += "*";
-                        }
-                        else {
-                          expression += numArray[index].toString();
-                        }
-                      });
-
-                    }, child: Text(numArray[index].toString()))),
-                  );
+                    child:ClipOval(
+                        child: Material(
+                          color: Colors.blue,
+                          shape: const CircleBorder(),
+                          child: InkWell(
+                            splashColor: Colors.green,
+                            customBorder: CircleBorder(),
+                            onTap: (){
+                              no2Controller.text = expression;
+                              setState(() {
+                                if(numArray[index]=='C'){
+                                  expression = '';
+                                  no1Controller.clear();
+                                  no2Controller.clear();
+                                } else if(numArray[index]=='='){
+                                  // String m = Calculator.Calculation(expression);
+                                  Calculator ca = Calculator();
+                                  String a = ca.Calculation(expression);
+                                  print(a.toString());
+                                  no1Controller.text = a.toString();
+                                }
+                                else if(numArray[index]=='+'){
+                                  expression += '+';
+                                }
+                                else if(numArray[index]=='-'){
+                                  expression += "-";
+                                }
+                                else if(numArray[index]=='x'){
+                                  expression += "*";
+                                }
+                                else {
+                                  expression += numArray[index].toString();
+                                }
+                              });
+                            },
+                            child: Center(
+                              child: Text(
+                                numArray[index].toString(),
+                                style: const TextStyle(
+                                  color: Colors.white,   // IMPORTANT
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),)
+                    )
+                    );
                 }),
               )
 
