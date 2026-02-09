@@ -1,4 +1,6 @@
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import 'Calculator.dart';
@@ -19,7 +21,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Nitin'),
+      home: const MyHomePage(title:'Nitin'),
     );
   }
 }
@@ -34,17 +36,38 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  var openB=0;
+  var closeB=0;
+  int points =0;
   String expression = '';
   var no1Controller = TextEditingController();
   var no2Controller = TextEditingController();
   var resultController = TextEditingController();
 
+  int precedence(String op) {
+    if (op == "*" || op == "/") return 2;
+    if (op == "+" || op == "-") return 1;
+    return 0;
+  }
 
+bool isOperators(String ch){
+  return ch=="+" || ch=="-" || ch=="*" || ch=="/";
+}
+
+String isOperatorsstr(String ch){
+    String a = "";
+    if(ch=="*" || ch=="/"){
+      a=ch;
+    }
+    return a;
+}
 
 
   @override
   Widget build(BuildContext context) {
-    var numArray = ["C","(",")","CLR",7,8,9,"/",4,5,6,"x",1,2,3,"-",0,".","=","+"];
+    var numArray = ["C","(",")","CLR",7,8,9,"/",4,5,6,"*",1,2,3,"-",0,".","=","+"];
+
+
 
 
     return Scaffold(
@@ -59,7 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             children: [
               SizedBox(
-                height: 300,
+                height: 250,
                 child: Column(
                   children: [
                     Padding(
@@ -85,6 +108,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: TextField(
                         controller: no2Controller,
                         readOnly: true,
+                        maxLines: 1,
+                        scrollPhysics: const BouncingScrollPhysics(),
+                        scrollController: ScrollController(),
                         textAlign: TextAlign.right,
                         style: const TextStyle(
                           fontSize: 32,
@@ -101,9 +127,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   ],
                 ),
               ),
-
               Expanded(
-                child: GridView.builder(itemCount: numArray.length,gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4,childAspectRatio: 1,crossAxisSpacing: 12,mainAxisSpacing: 12), itemBuilder: (context,index){
+                child: GridView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: numArray.length,gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4,childAspectRatio: 1,crossAxisSpacing: 12,mainAxisSpacing: 12), itemBuilder: (context,index){
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child:ClipOval(
@@ -114,33 +141,175 @@ class _MyHomePageState extends State<MyHomePage> {
                             splashColor: Colors.green,
                             customBorder: CircleBorder(),
                             onTap: (){
-                              no2Controller.text = expression;
+                              // no2Controller.text = expression;
+                              // print(no2Controller.text);
                               setState(() {
-                                if(numArray[index]=='C'){
+                                // print(no2Controller.text);
+                                if (numArray[index] == 'C') {
                                   expression = '';
                                   no1Controller.clear();
                                   no2Controller.clear();
-                                } else if(numArray[index]=='='){
+                                }
+                                else if(numArray[index] == "CLR"){
+                                  String currentText = no2Controller.text;
+                                  // print(currentText);
+                                  if(currentText.isNotEmpty){
+                                    currentText=currentText.substring(0,currentText.length-1);
+                                  }
+
+                                  expression=currentText.toString();
+                                  no2Controller.text = expression;
+
+                                }
+                                else if (numArray[index] == '=') {
                                   // String m = Calculator.Calculation(expression);
                                   Calculator ca = Calculator();
+
+                                  // if(closeB>openB){
+                                  //   while(closeB>openB && expression.endsWith(")")){
+                                  //     expression = expression.substring(0,expression.length-1);
+                                  //     closeB--;
+                                  //   }
+                                  // }
+                                  // print(openB);
+                                  // print(closeB);
+
+                                    while(openB>closeB){
+                                      expression+=")";
+                                      closeB++;
+                                    }
+
                                   String a = ca.Calculation(expression);
-                                  print(a.toString());
+                                  // print(a.toString());
+
+
                                   no1Controller.text = a.toString();
+                                  points=0;
+                                  openB=0;
+                                  closeB=0;
                                 }
-                                else if(numArray[index]=='+'){
-                                  expression += '+';
+                                // else if (numArray[index] == '+') {
+                                //   expression += '+';
+                                // }
+                                // else if (numArray[index] == '-') {
+                                //   expression += '-';
+                                // }
+                                // else if (numArray[index] == 'x') {
+                                //   expression += '*';
+                                // }
+                                // else if (numArray[index] == "/") {
+                                //   expression += '/';
+                                //   print(numArray[index].toString());
+                                // }
+                                else if(isOperators(numArray[index].toString())){
+                                  if(expression.isEmpty){
+                                    return;
+                                  }
+                                  String prevChar = expression[expression.length-1];
+                                  String currentChar = numArray[index].toString();
+                                  // print(prevChar);
+                                  if(isOperators(prevChar) && (prevChar!="*" && prevChar!="/" && prevChar=="-")){
+                                    return;
+                                  }
+                                  // if(isOperators(prevChar) && (prevChar!="*" && prevChar=="-" && prevChar=="+")){
+                                  //   return;
+                                  // }
+                                  // if(isOperators(prevChar) && (prevChar!="*" && prevChar=="/" && currentChar=="/")){
+                                  //   return;
+                                  // }
+                                  //
+                                  // if(isOperators(prevChar) && (prevChar!="/" && prevChar=="*" && currentChar=="/")){
+                                  //   return;
+                                  // }
+                                  if(isOperators(prevChar) && isOperators(currentChar) && currentChar!="-"){
+                                    return;
+                                  }
+                                  // if(isOperators(prevChar) && (prevChar!="*" && prevChar=="/" && currentChar=="*")){
+                                  //   return;
+                                  // }
+                                  expression+=numArray[index].toString();
+                                  points=0;
                                 }
-                                else if(numArray[index]=='-'){
-                                  expression += "-";
+                                else if(numArray[index] =="(") {
+                                    setState(() {
+                                      openB++;
+                                      expression += numArray[index].toString();
+                                      // print(openB);
+                                    });
+                                    points=0;
+
+                                  // if(closeB>openB){
+                                  //   return;
+                                  // }
+                                  //
+                                  // // print(openB);
+                                  // setState(() {
+                                  //   openB++;
+                                  //   closeB++;
+                                  // });
+                                  // print(openB);
+
                                 }
-                                else if(numArray[index]=='x'){
-                                  expression += "*";
+                                else if(numArray[index]==")"){
+                                  if(closeB<openB){
+                                    setState(() {
+                                      closeB++;
+                                      expression += numArray[index].toString();
+                                      print(closeB);
+                                    });
+                                  }
+                                  else{
+                                    return;
+                                  }
+
+
+
+
                                 }
-                                else {
-                                  expression += numArray[index].toString();
+                                else if(numArray[index]=="."){
+                                  setState(() {
+
+                                    if(expression.isEmpty){
+                                      expression+="0.";
+                                      points=1;
+                                    }
+                                    if(points==0) {
+                                      expression += ".";
+                                      points++;
+                                    }
+                                    // }
+                                    // else{
+                                    //   return;
+                                    // }
+
+
+                                  });
+
                                 }
-                              });
-                            },
+
+                                else{
+                                  expression+=numArray[index].toString();
+                                }
+
+                                no2Controller.text = expression;
+                              });}
+
+
+                                // else if(isOperators(numArray[index].toString())){
+                                //     String op = numArray[index].toString();
+                                //
+                                //     if(expression.isEmpty){
+                                //       return;
+                                //     }
+                                //
+                                //     String lastChar = expression[expression.length-1];
+                                //
+                                //     if(isOperators(lastChar)){
+                                //       return;
+                                //     }
+                                //
+                                // }
+                            ,
                             child: Center(
                               child: Text(
                                 numArray[index].toString(),
@@ -156,7 +325,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     );
                 }),
               )
-
             ],
 
           ),
