@@ -1,131 +1,138 @@
 
 import 'dart:math';
+
+import 'package:hive/hive.dart';
+
+
+class holderClass{
+  List<String> splitter(String expression) {
+    List<String> splitted = [];
+    String digits = "";
+    for (int i = 0; i < expression.length; i++) {
+      if (i > 0) {
+        String prev = expression[i - 1];
+        String curr = expression[i];
+
+        bool prevI = RegExp(r'[0-9.]').hasMatch(prev);
+        bool currI = RegExp(r'[0-9.]').hasMatch(curr);
+        if (
+        (prev == ')' && currI) ||
+            (prevI && curr == '(') ||
+            (prev == ')' && curr == '(')
+        ) {
+          if (digits
+              .trim()
+              .isNotEmpty) {
+            splitted.add(digits);
+            digits = '';
+          }
+          splitted.add("*");
+        }
+      }
+
+      if (expression[i] != '+' && expression[i] != '-' &&
+          expression[i] != '*' && expression[i] != '/' &&
+          expression[i] != '=' && expression[i] != '(' &&
+          expression[i] != ')') {
+        digits += expression[i];
+      }
+      else {
+        if ((expression[i] == "+" || expression[i] == "-") && (i == 0 ||
+            expression[i - 1] == "(" || expression[i - 1] == '+' ||
+            expression[i - 1] == '-' || expression[i - 1] == '*' ||
+            expression[i - 1] == '/' || expression[i - 1] == "=")) {
+          if (expression[i] == "-" && i + 1 < expression.length &&
+              expression[i + 1] == '(') {
+            splitted.add("-1");
+            splitted.add("*");
+            continue;
+          }
+          digits += expression[i];
+          // print(digits);
+          continue;
+        }
+
+
+// if(digits.isNotEmpty){
+// splitted.add(digits);
+// }
+        if (digits
+            .trim()
+            .isNotEmpty) {
+          splitted.add(digits);
+        }
+        digits = '';
+        digits += expression[i];
+        splitted.add(expression[i]);
+        digits = '';
+      }
+    }
+    // if (digits.isNotEmpty) {
+    //   int j = 0;
+    //   if (digits.startsWith("+") || digits.startsWith("-")) {
+    //     int minusCount = 0;
+    //
+    //     while (j < digits.length && (digits[j] == "-")) {
+    //       minusCount++;
+    //       j++;
+    //     }
+    //     // print(minusCount);
+    //
+    //
+    //     String numberPart = digits.substring(j);
+    //     if (minusCount % 2 != 0) {
+    //       splitted.add("-" + numberPart);
+    //     }
+    //     else {
+    //       splitted.add(numberPart);
+    //     }
+    //     // for(int i=0;i<expression.length;i++){
+    //     //   if(expression[i]!="+" && expression[i]!="-" && expression[i] != "*" && expression[i] != "/"){
+    //     //     splitted.add(expression[i]);
+    //     //   }
+    //     // }
+    //   }
+    //
+    //   splitted.add(digits);
+    // }
+
+    // print(digits);
+
+    if (digits.isNotEmpty) {
+      int minusCount = 0;
+      int j = 0;
+
+      while (j < digits.length && (digits[j] == "+" || digits[j] == "-")) {
+        if (digits[j] == "-") {
+          minusCount++;
+        }
+        j++;
+      }
+      String numberPart = digits.substring(j);
+
+      if (minusCount % 2 != 0) {
+        splitted.add("-" + numberPart);
+      }
+      else {
+        splitted.add(numberPart);
+      }
+    }
+    print(splitted);
+
+    return splitted;
+  }
+}
 class Calculator {
   String Calculation(String expression) {
     String prefinal = "";
 
     List<String> stack = [];
     String digits = "";
-
-    List<String> splitter(String expression) {
-      List<String> splitted = [];
-      String digits = "";
-      for (int i = 0; i < expression.length; i++) {
-        if (i > 0) {
-          String prev = expression[i - 1];
-          String curr = expression[i];
-
-          bool prevI = RegExp(r'[0-9.]').hasMatch(prev);
-          bool currI = RegExp(r'[0-9.]').hasMatch(curr);
-          if (
-          (prev == ')' && currI) ||
-              (prevI && curr == '(') ||
-              (prev == ')' && curr == '(')
-          ) {
-            if (digits
-                .trim()
-                .isNotEmpty) {
-              splitted.add(digits);
-              digits = '';
-            }
-            splitted.add("*");
-          }
-        }
-
-        if (expression[i] != '+' && expression[i] != '-' &&
-            expression[i] != '*' && expression[i] != '/' &&
-            expression[i] != '=' && expression[i] != '(' &&
-            expression[i] != ')') {
-          digits += expression[i];
-        }
-        else {
-          if ((expression[i] == "+" || expression[i] == "-") && (i == 0 ||
-              expression[i - 1] == "(" || expression[i - 1] == '+' ||
-              expression[i - 1] == '-' || expression[i - 1] == '*' ||
-              expression[i - 1] == '/' || expression[i - 1] == "=")) {
-            if (expression[i] == "-" && i + 1 < expression.length &&
-                expression[i + 1] == '(') {
-              splitted.add("-1");
-              splitted.add("*");
-              continue;
-            }
-            digits += expression[i];
-            // print(digits);
-            continue;
-          }
+    holderClass h = holderClass();
 
 
-// if(digits.isNotEmpty){
-// splitted.add(digits);
-// }
-          if (digits
-              .trim()
-              .isNotEmpty) {
-            splitted.add(digits);
-          }
-          digits = '';
-          digits += expression[i];
-          splitted.add(expression[i]);
-          digits = '';
-        }
-      }
-      // if (digits.isNotEmpty) {
-      //   int j = 0;
-      //   if (digits.startsWith("+") || digits.startsWith("-")) {
-      //     int minusCount = 0;
-      //
-      //     while (j < digits.length && (digits[j] == "-")) {
-      //       minusCount++;
-      //       j++;
-      //     }
-      //     // print(minusCount);
-      //
-      //
-      //     String numberPart = digits.substring(j);
-      //     if (minusCount % 2 != 0) {
-      //       splitted.add("-" + numberPart);
-      //     }
-      //     else {
-      //       splitted.add(numberPart);
-      //     }
-      //     // for(int i=0;i<expression.length;i++){
-      //     //   if(expression[i]!="+" && expression[i]!="-" && expression[i] != "*" && expression[i] != "/"){
-      //     //     splitted.add(expression[i]);
-      //     //   }
-      //     // }
-      //   }
-      //
-      //   splitted.add(digits);
-      // }
 
-      // print(digits);
-
-      if (digits.isNotEmpty) {
-        int minusCount = 0;
-        int j = 0;
-
-        while (j < digits.length && (digits[j] == "+" || digits[j] == "-")) {
-          if (digits[j] == "-") {
-            minusCount++;
-          }
-          j++;
-        }
-        String numberPart = digits.substring(j);
-
-        if (minusCount % 2 != 0) {
-          splitted.add("-" + numberPart);
-        }
-        else {
-          splitted.add(numberPart);
-        }
-      }
-    print(splitted);
-
-      return splitted;
-    }
-
-
-    List<String> splitted = splitter(expression);
+    List<String> splitted = h.splitter(expression);
     // print(splitted);
     List<String> postFix = [];
     int precedence(String op) {
@@ -287,7 +294,7 @@ class Calculator {
     // // // print(postFix);
     // // // print(postFix.length);
     String last = double.parse(evaluatedResult).toStringAsFixed(4);
-    print(last);
+    // print(last);
     prefinal = last;
     // print(last);
     int count = 0;
@@ -407,5 +414,5 @@ class Calculator {
   void main() {
 // Calculation("--+3");
     Calculator ca = Calculator();
-    print(ca.Calculation("-6234231*6"));
+    ca.Calculation("-6234231*6");
   }

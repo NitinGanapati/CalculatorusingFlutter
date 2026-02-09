@@ -2,10 +2,18 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
+import 'History.dart';
 
 import 'Calculator.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+
+  var directory = await getApplicationDocumentsDirectory();
+  Hive.init(directory.path);
+  await Hive.openBox('nitin');
   runApp(const MyApp());
 }
 
@@ -44,6 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
   var no2Controller = TextEditingController();
   var resultController = TextEditingController();
 
+
   int precedence(String op) {
     if (op == "*" || op == "/") return 2;
     if (op == "+" || op == "-") return 1;
@@ -65,7 +74,7 @@ String isOperatorsstr(String ch){
 
   @override
   Widget build(BuildContext context) {
-    var numArray = ["C","(",")","CLR",7,8,9,"/",4,5,6,"*",1,2,3,"-",0,".","=","+"];
+    var numArray = ["C","(",")","CLR",7,8,9,"/",4,5,6,"*",1,2,3,"-",0,".","=","+",];
 
 
 
@@ -127,6 +136,10 @@ String isOperatorsstr(String ch){
                   ],
                 ),
               ),
+              ElevatedButton(onPressed: ()  async{
+                Navigator.push(context,MaterialPageRoute(builder: (context)=>History()));
+
+              }, child: Icon(Icons.add)),
               Expanded(
                 child: GridView.builder(
                     physics: const NeverScrollableScrollPhysics(),
@@ -179,11 +192,41 @@ String isOperatorsstr(String ch){
                                       closeB++;
                                     }
 
+                                  holderClass hm = holderClass();
+                                  List<String> ak = hm.splitter(expression);
+                                  var objak = ak.join(" ");
+                                  print(objak);
+                                  var box = Hive.box('Nitin');
+                                  // box.add({
+                                  //   'value' : objak
+                                  // });
+                                  bool isDuplicate = true;
+                                  for (int i = 0; i < box.length; i++) {
+                                    isDuplicate = true;
+                                    var data = box.getAt(i);
+                                    if(data['value']==objak){
+                                      isDuplicate=false;
+                                    }
+
+
+                                  }
+                                  if(isDuplicate){
+                                    box.add({
+                                      'value' : objak
+                                    });
+                                  }
+
                                   String a = ca.Calculation(expression);
                                   // print(a.toString());
 
 
+
+
                                   no1Controller.text = a.toString();
+                                  // box.put({
+                                  //
+                                  // })
+
                                   points=0;
                                   openB=0;
                                   closeB=0;
@@ -255,7 +298,7 @@ String isOperatorsstr(String ch){
                                     setState(() {
                                       closeB++;
                                       expression += numArray[index].toString();
-                                      print(closeB);
+                                      // print(closeB);
                                     });
                                   }
                                   else{
