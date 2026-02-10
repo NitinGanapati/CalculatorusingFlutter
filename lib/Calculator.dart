@@ -2,6 +2,84 @@
 import 'dart:math';
 
 import 'package:hive/hive.dart';
+// class IndianDigit {
+//   String prefinal = "";
+
+//   String indianVal(String number) {
+//     int count = 0;
+//     int count2 = 0;
+//     for (int i = 0; i < number.length; i++) {
+//       if (number[i] == ".") {
+//         break;
+//       }
+//       else{
+//         count2++;
+//       }
+//       count++;
+//     }
+//     if (count > 3 || (number.startsWith("-") &&  count2>4) || count2>3) {
+//       String kn = "";
+//       String decimals = "";
+//       bool isNegative = false;
+//
+//       if (number.startsWith("-")) {
+//         isNegative = true;
+//         kn = kn.substring(1);
+//       }
+//       for (int i = 0; i < number.length; i++) {
+//         if (number[i] == ".") {
+//           kn = number.substring(0, i);
+//           decimals = number.substring(i);
+//           break;
+//         }
+//         else{
+//           decimals = number.substring(0,i);
+//         }
+//       }
+//       if (number.length > 3) {
+//         String formatted = "";
+//         String remaining = number.substring(0, number.length - 3);
+//         formatted = number.substring(number.length - 3);
+//         // print(remaining);
+//         // print(formatted);
+//
+//         int k = number.length - 4;
+//         int count = 0;
+//         List<String> emptyNumbers = <String>[];
+//         for (int i = remaining.length - 1; i >= 0; i--) {
+//           count++;
+//           if (count == 2) {
+//             emptyNumbers.insert(0, remaining[i + 1]);
+//             emptyNumbers.insert(0, remaining[i]);
+//             if (i > 0) {
+//               emptyNumbers.insert(0, ",");
+//             }
+//             count = 0;
+//           }
+//         }
+//         if (count == 1) {
+//           emptyNumbers.insert(0, remaining[0]);
+//         }
+//
+//
+//         // print(emptyNumbers);
+//
+//         String grouped = emptyNumbers.join();
+//         // print(grouped);
+//
+//         prefinal = grouped + "," + formatted;
+//
+//         if (isNegative) {
+//           prefinal = "-" + prefinal;
+//         }
+//
+//
+//         prefinal = prefinal + decimals;
+//       }
+//     }
+//     return prefinal;
+//   }
+// }
 
 
 class holderClass{
@@ -316,7 +394,7 @@ class Calculator {
         number = number.substring(1);
       }
       for (int i = 0; i < last.length; i++) {
-        if (last[i] == ".") {
+        if (last[i] == '.') {
           number = last.substring(0, i);
           decimals = last.substring(i);
           break;

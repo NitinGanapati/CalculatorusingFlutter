@@ -1,5 +1,6 @@
 
 import 'dart:math';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -45,6 +46,10 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   var openB=0;
+  bool showCursor = true;
+  final ScrollController _scrollController = ScrollController();
+
+  late Timer _timer;
   var closeB=0;
   int points =0;
   String expression = '';
@@ -70,6 +75,23 @@ String isOperatorsstr(String ch){
     }
     return a;
 }
+  @override
+  void initState() {
+    super.initState();
+
+    _timer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      setState(() {
+        showCursor = !showCursor;
+      });
+    });
+  }
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+
 
 
   @override
@@ -91,7 +113,7 @@ String isOperatorsstr(String ch){
           child: Column(
             children: [
               SizedBox(
-                height: 250,
+                height: 260,
                 child: Column(
                   children: [
                     Padding(
@@ -114,25 +136,56 @@ String isOperatorsstr(String ch){
                     ),
                     Padding(
                       padding: const EdgeInsets.all(22.0),
-                      child: TextField(
-                        controller: no2Controller,
-                        readOnly: true,
-                        maxLines: 1,
-                        scrollPhysics: const BouncingScrollPhysics(),
-                        scrollController: ScrollController(),
-                        textAlign: TextAlign.right,
-                        style: const TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                      // child: TextField(
+                      //   controller: no2Controller,
+                      //   readOnly: true,
+                      //   maxLines: 1,
+                      //   enableInteractiveSelection: true,
+                      //   scrollPhysics: const BouncingScrollPhysics(),
+                      //   scrollController: ScrollController(),
+                      //   textAlign: TextAlign.right,
+                      //   style: const TextStyle(
+                      //     fontSize: 32,
+                      //     fontWeight: FontWeight.bold,
+                      //     color: Colors.white,
+                      //   ),
+                      //   decoration: const InputDecoration(
+                      //     border: InputBorder.none,
+                      //     contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                      //   ),
+                      // )
+                        child: TextField(
+                          controller: no2Controller,
+                          readOnly: true,
+                          textAlign: TextAlign.right,
+                          style: const TextStyle(
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                          ),
                         ),
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                        ),
-                      )
-                      ,
                     ),
+                    // Padding(
+                    //   padding: const EdgeInsets.all(22.0),
+                    //   child: SingleChildScrollView(
+                    //     controller: _scrollController,
+                    //     scrollDirection: Axis.horizontal,
+                    //     reverse: true,   // IMPORTANT
+                    //     child: Text(
+                    //       expression,
+                    //       textAlign: TextAlign.right,
+                    //       style: const TextStyle(
+                    //         fontSize: 42,
+                    //         fontWeight: FontWeight.bold,
+                    //         color: Colors.white,
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
@@ -245,13 +298,24 @@ String isOperatorsstr(String ch){
                                 //   print(numArray[index].toString());
                                 // }
                                 else if(isOperators(numArray[index].toString())){
+                                  if(numArray[index]=='-' && expression.isEmpty){
+                                      expression+=numArray[index].toString();
+                                      no2Controller.text = expression;
+                                      return;
+                                  }
                                   if(expression.isEmpty){
                                     return;
                                   }
                                   String prevChar = expression[expression.length-1];
                                   String currentChar = numArray[index].toString();
+
+                                  if(isOperators(currentChar) && prevChar=="("){
+                                    return;
+                                  }
+
+
                                   // print(prevChar);
-                                  if(isOperators(prevChar) && (prevChar!="*" && prevChar!="/" && prevChar=="-")){
+                                  if(isOperators(prevChar) && isOperators(currentChar) && currentChar!='-'){
                                     return;
                                   }
                                   // if(isOperators(prevChar) && (prevChar!="*" && prevChar=="-" && prevChar=="+")){
@@ -264,9 +328,6 @@ String isOperatorsstr(String ch){
                                   // if(isOperators(prevChar) && (prevChar!="/" && prevChar=="*" && currentChar=="/")){
                                   //   return;
                                   // }
-                                  if(isOperators(prevChar) && isOperators(currentChar) && currentChar!="-"){
-                                    return;
-                                  }
                                   // if(isOperators(prevChar) && (prevChar!="*" && prevChar=="/" && currentChar=="*")){
                                   //   return;
                                   // }
@@ -304,10 +365,6 @@ String isOperatorsstr(String ch){
                                   else{
                                     return;
                                   }
-
-
-
-
                                 }
                                 else if(numArray[index]=="."){
                                   setState(() {
@@ -333,9 +390,14 @@ String isOperatorsstr(String ch){
                                 else{
                                   expression+=numArray[index].toString();
                                 }
-
+                                // IndianDigit a = IndianDigit();
+                                // no2Controller.text = a.indianVal(expression);
                                 no2Controller.text = expression;
-                              });}
+                                // setState(() {
+                                //
+                                // });
+                              }
+                              );}
 
 
                                 // else if(isOperators(numArray[index].toString())){
@@ -366,6 +428,7 @@ String isOperatorsstr(String ch){
                           ),)
                     )
                     );
+
                 }),
               )
             ],
