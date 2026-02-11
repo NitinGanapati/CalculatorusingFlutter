@@ -401,7 +401,20 @@ class Calculator {
         }
       }
       // print(number);
-      // print(decimals);
+      print(decimals);
+      print(decimals.length-1);
+
+      int k = decimals.length-1;
+
+      // for(int i=1;i<decimals.length;i++){
+      //   if(decimals[i]== '0'){
+      //     k--;
+      //   }
+      // }
+      while (k>0 && decimals[k]=='0') {
+        k--;
+      }
+      print(k);
 
       // print(number.length);
 
@@ -441,9 +454,9 @@ class Calculator {
         if (isNegative) {
           prefinal = "-" + prefinal;
         }
-
-
-        prefinal = prefinal + decimals;
+        decimals = decimals.replaceAll(RegExp(r'0+$'),'');
+          prefinal = prefinal + decimals;
+        // prefinal = prefinal + decimals;
 
         // print(prefinal);
         // while(k!=0){
